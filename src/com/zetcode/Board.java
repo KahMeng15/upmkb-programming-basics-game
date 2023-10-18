@@ -14,6 +14,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
@@ -28,6 +32,9 @@ public class Board extends JPanel implements ActionListener {
     private final Color dotColor = new Color(192, 192, 0);
     private Color mazeColor;
 
+    private int highScore = 0;
+
+    
     private boolean inGame = false;
     private boolean dying = false;
 
@@ -83,6 +90,8 @@ public class Board extends JPanel implements ActionListener {
     private short[] screenData;
     private Timer timer;
 
+    private boolean youDiedScreen = false;
+    
     public Board() {
 
         loadImages();
@@ -178,14 +187,24 @@ public class Board extends JPanel implements ActionListener {
 
         g.setFont(smallFont);
         g.setColor(new Color(96, 128, 255));
+        ////score text
         s = "Score: " + score;
-        g.drawString(s, SCREEN_SIZE / 2 + 96, SCREEN_SIZE + 16);
-
+        g.drawString(s, SCREEN_SIZE / 2 + 96, SCREEN_SIZE + 13);
+        
+        ////pacman lives
         for (i = 0; i < pacsLeft; i++) {
             g.drawImage(pacman3left, i * 28 + 8, SCREEN_SIZE + 1, this);
         }
     }
-
+    
+    private void drawHighScore(Graphics2D g) {
+        ///highscore text
+        g.setFont(smallFont);
+        g.setColor(new Color(255, 255, 0));
+        String highScoreText = "High Score: " + highScore;
+        g.drawString(highScoreText, SCREEN_SIZE / 2 + 96, SCREEN_SIZE + 27);
+    }
+        
     private void checkMaze() {
 
         short i = 0;
@@ -200,6 +219,10 @@ public class Board extends JPanel implements ActionListener {
             i++;
         }
 
+        if (score > highScore) {
+        highScore = score;
+        }
+        
         if (finished) {
 
             score += 50;
@@ -221,9 +244,10 @@ public class Board extends JPanel implements ActionListener {
         pacsLeft--;
 
         if (pacsLeft == 0) {
+            youDiedScreen = true;
             inGame = false;
         }
-
+        
         continueLevel();
     }
 
@@ -351,43 +375,48 @@ public class Board extends JPanel implements ActionListener {
     }
         
     private void movePacman2() {
+
         int pos2;
-        short ch2;
-        
+        short ch;
+
         if (req_dx2 == -pacmand_x2 && req_dy2 == -pacmand_y2) {
             pacmand_x2 = req_dx2;
             pacmand_y2 = req_dy2;
             view_dx2 = pacmand_x2;
             view_dy2 = pacmand_y2;
         }
-        if (pacman_x2 % BLOCK_SIZE == 0 && pacman_y2 % BLOCK_SIZE == 0) {
-            pos2 = pacman_x2 / BLOCK_SIZE + N_BLOCKS * (int) (pacman_y2 / BLOCK_SIZE);
-            ch2 = screenData[pos2];
 
-        if (req_dx2 != 0 || req_dy2 != 0) {
-            if (!((req_dx2 == -1 && req_dy2 == 0 && (ch2 & 1) != 0)
-                    || (req_dx2 == 1 && req_dy2 == 0 && (ch2 & 4) != 0)
-                    || (req_dx2 == 0 && req_dy2 == -1 && (ch2 & 2) != 0)
-                    || (req_dx2 == 0 && req_dy2 == 1 && (ch2 & 8) != 0))) {
-                pacmand_x2 = req_dx2;
-                pacmand_y2 = req_dy2;
+        if (pacman_x2 % BLOCK_SIZE == 0 && pacman_y2 % BLOCK_SIZE == 0) {
+            pos2 = pacman_x2 / BLOCK_SIZE + N_BLOCKS * (int) (pacman_y / BLOCK_SIZE);
+            ch = screenData[pos2];
+
+            if ((ch & 16) != 0) {
+                screenData[pos2] = (short) (ch & 15);
+                score++;
+            }
+
+            if (req_dx2 != 0 || req_dy2 != 0) {
+                if (!((req_dx2 == -1 && req_dy2 == 0 && (ch & 1) != 0)
+                        || (req_dx2 == 1 && req_dy2 == 0 && (ch & 4) != 0)
+                        || (req_dx2 == 0 && req_dy2 == -1 && (ch & 2) != 0)
+                        || (req_dx2 == 0 && req_dy2 == 1 && (ch & 8) != 0))) {
+                    pacmand_x = req_dx2;
+                    pacmand_y = req_dy2;
+                    view_dx2 = pacmand_x2;
+                    view_dy2 = pacmand_y2;
+                }
+            }
+            // Check for standstill
+            if ((pacmand_x2 == -1 && pacmand_y2 == 0 && (ch & 1) != 0)
+                    || (pacmand_x2 == 1 && pacmand_y2 == 0 && (ch & 4) != 0)
+                    || (pacmand_x2 == 0 && pacmand_y2 == -1 && (ch & 2) != 0)
+                    || (pacmand_x2 == 0 && pacmand_y2 == 1 && (ch & 8) != 0)) {
+                pacmand_x2 = 0;
+                pacmand_y2 = 0;
             }
         }
-
-        // Check for standstill
-        if ((pacmand_x2 == -1 && pacmand_y2 == 0 && (ch2 & 1) != 0)
-                || (pacmand_x2 == 1 && pacmand_y2 == 0 && (ch2 & 4) != 0)
-                || (pacmand_x2 == 0 && pacmand_y2 == -1 && (ch2 & 2) != 0)
-                || (pacmand_x2 == 0 && pacmand_y2 == 1 && (ch2 & 8) != 0)) {
-            pacmand_x2 = 0;
-            pacmand_y2 = 0;
-        }
-    
-        pacman_x2 = pacman_x2 + PACMAN_SPEED * pacmand_x2;
-        pacman_y2 = pacman_y2 + PACMAN_SPEED * pacmand_y2;
-    
-        }
-      System.out.println("Pacman2: x=" + pacman_x2 + " y=" + pacman_y2 + " dx=" + req_dx2 + " dy=" + req_dy2);
+        pacman_x2 = pacman_x2 + PACMAN_SPEED * pacmand_x;
+        pacman_y2 = pacman_y2 + PACMAN_SPEED * pacmand_y;
     }
 
     /////////draw1
@@ -603,6 +632,7 @@ public class Board extends JPanel implements ActionListener {
 
     private void initGame() {
 
+        youDiedScreen = false;
         pacsLeft = 3;
         score = 0;
         initLevel();
@@ -641,6 +671,8 @@ public class Board extends JPanel implements ActionListener {
 
             ghostSpeed[i] = validSpeeds[random];
         }
+        
+        
 
         pacman_x = 8 * BLOCK_SIZE;
         pacman_y = 11 * BLOCK_SIZE;
@@ -703,9 +735,26 @@ public class Board extends JPanel implements ActionListener {
 
         drawMaze(g2d);
         drawScore(g2d);
+        drawHighScore(g2d);
         doAnim();
 
-        if (inGame) {
+        if (youDiedScreen) {
+            g2d.setColor(new Color(0, 32, 48));
+            g2d.fillRect(50, SCREEN_SIZE / 2 - 30, SCREEN_SIZE - 100, 50);
+            g2d.setColor(Color.white);
+            g2d.drawRect(50, SCREEN_SIZE / 2 - 30, SCREEN_SIZE - 100, 50);
+
+            String youDiedText = "You died! Your score: " + score;
+            String restartGame = "Press X to play again";
+            Font small = new Font("Helvetica", Font.BOLD, 14);
+            FontMetrics metr = this.getFontMetrics(small);
+            
+            g2d.setColor(Color.white);
+            g2d.setFont(small);
+            g2d.drawString(youDiedText, (SCREEN_SIZE - metr.stringWidth(youDiedText)) / 2, SCREEN_SIZE / 2 - 10);
+            g2d.drawString(restartGame, (SCREEN_SIZE - metr.stringWidth(restartGame)) / 2, SCREEN_SIZE / 2 + 10);
+        }
+        else if (inGame) {  
             playGame(g2d);
             drawPacman2(g2d);
             drawPacman(g2d);
@@ -717,6 +766,27 @@ public class Board extends JPanel implements ActionListener {
         Toolkit.getDefaultToolkit().sync();
         g2d.dispose();
     }
+    
+    /////// score saving
+    private void saveHighScore() {
+    try (FileWriter writer = new FileWriter("highscore.txt")) {
+            writer.write(String.valueOf(highScore));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    private void loadHighScore() {
+    try (BufferedReader reader = new BufferedReader(new FileReader("highscore.txt"))) {
+        String line = reader.readLine();
+        if (line != null) {
+            highScore = Integer.parseInt(line);
+        }
+    } catch (IOException | NumberFormatException e) {
+        e.printStackTrace();
+    }
+}
+    
 //////movement1
         class TAdapter extends KeyAdapter {
 
