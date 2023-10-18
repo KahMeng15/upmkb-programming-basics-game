@@ -54,6 +54,9 @@ public class Board extends JPanel implements ActionListener {
 
     private int pacman_x, pacman_y, pacmand_x, pacmand_y;
     private int req_dx, req_dy, view_dx, view_dy;
+    
+    private int req_dx2, req_dy2, view_dx2, view_dy2;
+    private int pacman_x2, pacman_y2, pacmand_x2, pacmand_y2;
 
     private final short levelData[] = {
             19, 26, 26, 26, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 22,
@@ -90,6 +93,7 @@ public class Board extends JPanel implements ActionListener {
     private void initBoard() {
 
         addKeyListener(new TAdapter());
+        addKeyListener(new TAdapter2());
 
         setFocusable(true);
 
@@ -143,7 +147,9 @@ public class Board extends JPanel implements ActionListener {
         } else {
 
             movePacman();
+            movePacman2();
             drawPacman(g2d);
+            drawPacman2(g2d);
             moveGhosts(g2d);
             checkMaze();
         }
@@ -156,7 +162,7 @@ public class Board extends JPanel implements ActionListener {
         g2d.setColor(Color.white);
         g2d.drawRect(50, SCREEN_SIZE / 2 - 30, SCREEN_SIZE - 100, 50);
 
-        String s = "Press s to start.";
+        String s = "Press X to start.";
         Font small = new Font("Helvetica", Font.BOLD, 14);
         FontMetrics metr = this.getFontMetrics(small);
 
@@ -331,7 +337,6 @@ public class Board extends JPanel implements ActionListener {
                     view_dy = pacmand_y;
                 }
             }
-
             // Check for standstill
             if ((pacmand_x == -1 && pacmand_y == 0 && (ch & 1) != 0)
                     || (pacmand_x == 1 && pacmand_y == 0 && (ch & 4) != 0)
@@ -344,7 +349,49 @@ public class Board extends JPanel implements ActionListener {
         pacman_x = pacman_x + PACMAN_SPEED * pacmand_x;
         pacman_y = pacman_y + PACMAN_SPEED * pacmand_y;
     }
+        
+    private void movePacman2() {
+        int pos2;
+        short ch2;
+        
+        if (req_dx2 == -pacmand_x2 && req_dy2 == -pacmand_y2) {
+            pacmand_x2 = req_dx2;
+            pacmand_y2 = req_dy2;
+            view_dx2 = pacmand_x2;
+            view_dy2 = pacmand_y2;
+        }
+        if (pacman_x2 % BLOCK_SIZE == 0 && pacman_y2 % BLOCK_SIZE == 0) {
+            pos2 = pacman_x2 / BLOCK_SIZE + N_BLOCKS * (int) (pacman_y2 / BLOCK_SIZE);
+            ch2 = screenData[pos2];
 
+        if (req_dx2 != 0 || req_dy2 != 0) {
+            if (!((req_dx2 == -1 && req_dy2 == 0 && (ch2 & 1) != 0)
+                    || (req_dx2 == 1 && req_dy2 == 0 && (ch2 & 4) != 0)
+                    || (req_dx2 == 0 && req_dy2 == -1 && (ch2 & 2) != 0)
+                    || (req_dx2 == 0 && req_dy2 == 1 && (ch2 & 8) != 0))) {
+                pacmand_x2 = req_dx2;
+                pacmand_y2 = req_dy2;
+            }
+        }
+
+        // Check for standstill
+        if ((pacmand_x2 == -1 && pacmand_y2 == 0 && (ch2 & 1) != 0)
+                || (pacmand_x2 == 1 && pacmand_y2 == 0 && (ch2 & 4) != 0)
+                || (pacmand_x2 == 0 && pacmand_y2 == -1 && (ch2 & 2) != 0)
+                || (pacmand_x2 == 0 && pacmand_y2 == 1 && (ch2 & 8) != 0)) {
+            pacmand_x2 = 0;
+            pacmand_y2 = 0;
+        }
+    
+        pacman_x2 = pacman_x2 + PACMAN_SPEED * pacmand_x2;
+        pacman_y2 = pacman_y2 + PACMAN_SPEED * pacmand_y2;
+    
+        }
+      System.out.println("Pacman2: x=" + pacman_x2 + " y=" + pacman_y2 + " dx=" + req_dx2 + " dy=" + req_dy2);
+    }
+
+    /////////draw1
+    
     private void drawPacman(Graphics2D g2d) {
 
         if (view_dx == -1) {
@@ -429,7 +476,92 @@ public class Board extends JPanel implements ActionListener {
                 break;
         }
     }
+    ////////// draw2
+    private void drawPacman2(Graphics2D g2d) {
 
+        if (view_dx2 == -1) {
+            drawPacmanLeft2(g2d);
+        } else if (view_dx2 == 1) {
+            drawPacmanRight2(g2d);
+        } else if (view_dy2 == -1) {
+            drawPacmanUp2(g2d);
+        } else {
+            drawPacmanDown2(g2d);
+        }
+    }
+
+    private void drawPacmanUp2(Graphics2D g2d) {
+
+        switch (pacmanAnimPos) {
+            case 1:
+                g2d.drawImage(pacman2up, pacman_x2 + 1, pacman_y2 + 1, this);
+                break;
+            case 2:
+                g2d.drawImage(pacman3up, pacman_x2 + 1, pacman_y2 + 1, this);
+                break;
+            case 3:
+                g2d.drawImage(pacman4up, pacman_x2 + 1, pacman_y2 + 1, this);
+                break;
+            default:
+                g2d.drawImage(pacman1, pacman_x2 + 1, pacman_y2 + 1, this);
+                break;
+        }
+    }
+
+    private void drawPacmanDown2(Graphics2D g2d) {
+
+        switch (pacmanAnimPos) {
+            case 1:
+                g2d.drawImage(pacman2down, pacman_x2 + 1, pacman_y2 + 1, this);
+                break;
+            case 2:
+                g2d.drawImage(pacman3down, pacman_x2 + 1, pacman_y2 + 1, this);
+                break;
+            case 3:
+                g2d.drawImage(pacman4down, pacman_x2 + 1, pacman_y2 + 1, this);
+                break;
+            default:
+                g2d.drawImage(pacman1, pacman_x2 + 1, pacman_y2 + 1, this);
+                break;
+        }
+    }
+
+    private void drawPacmanLeft2(Graphics2D g2d) {
+
+        switch (pacmanAnimPos) {
+            case 1:
+                g2d.drawImage(pacman2left, pacman_x2 + 1, pacman_y2 + 1, this);
+                break;
+            case 2:
+                g2d.drawImage(pacman3left, pacman_x2 + 1, pacman_y2 + 1, this);
+                break;
+            case 3:
+                g2d.drawImage(pacman4left, pacman_x2 + 1, pacman_y2 + 1, this);
+                break;
+            default:
+                g2d.drawImage(pacman1, pacman_x2 + 1, pacman_y2 + 1, this);
+                break;
+        }
+    }
+
+    private void drawPacmanRight2(Graphics2D g2d) {
+
+        switch (pacmanAnimPos) {
+            case 1:
+                g2d.drawImage(pacman2right, pacman_x2 + 1, pacman_y2 + 1, this);
+                break;
+            case 2:
+                g2d.drawImage(pacman3right, pacman_x2 + 1, pacman_y2 + 1, this);
+                break;
+            case 3:
+                g2d.drawImage(pacman4right, pacman_x2 + 1, pacman_y2 + 1, this);
+                break;
+            default:
+                g2d.drawImage(pacman1, pacman_x2 + 1, pacman_y2 + 1, this);
+                break;
+        }
+    }
+    //////////////////
     private void drawMaze(Graphics2D g2d) {
 
         short i = 0;
@@ -510,14 +642,29 @@ public class Board extends JPanel implements ActionListener {
             ghostSpeed[i] = validSpeeds[random];
         }
 
-        pacman_x = 7 * BLOCK_SIZE;
+        pacman_x = 8 * BLOCK_SIZE;
         pacman_y = 11 * BLOCK_SIZE;
+        pacman_x2 = 6 * BLOCK_SIZE;
+        pacman_y2 = 11 * BLOCK_SIZE;
+        
         pacmand_x = 0;
         pacmand_y = 0;
+       
+        pacmand_x2 = 0;
+        pacmand_y2 = 0;
+        
         req_dx = 0;
         req_dy = 0;
+        
+        req_dx2 = 0;
+        req_dy2 = 0;
+        
         view_dx = -1;
         view_dy = 0;
+        
+        view_dx2 = -1;
+        view_dy2 = 0;
+        
         dying = false;
     }
 
@@ -560,6 +707,8 @@ public class Board extends JPanel implements ActionListener {
 
         if (inGame) {
             playGame(g2d);
+            drawPacman2(g2d);
+            drawPacman(g2d);
         } else {
             showIntroScreen(g2d);
         }
@@ -568,8 +717,8 @@ public class Board extends JPanel implements ActionListener {
         Toolkit.getDefaultToolkit().sync();
         g2d.dispose();
     }
-
-    class TAdapter extends KeyAdapter {
+//////movement1
+        class TAdapter extends KeyAdapter {
 
         @Override
         public void keyPressed(KeyEvent e) {
@@ -599,13 +748,13 @@ public class Board extends JPanel implements ActionListener {
                     }
                 }
             } else {
-                if (key == 's' || key == 'S') {
+                if (key == 'x' || key == 'X') {
                     inGame = true;
                     initGame();
                 }
             }
         }
-
+        
         @Override
         public void keyReleased(KeyEvent e) {
 
@@ -618,10 +767,47 @@ public class Board extends JPanel implements ActionListener {
             }
         }
     }
+//////movement2
+    class TAdapter2 extends KeyAdapter {
+
+    @Override
+    public void keyPressed(KeyEvent q) {
+        int key = q.getKeyCode();
+
+        if (inGame) {
+            if (key == KeyEvent.VK_A) {
+                req_dx2 = -1;
+                req_dy2 = 0;
+            } else if (key == KeyEvent.VK_D) {
+                req_dx2 = 1;
+                req_dy2 = 0;
+            } else if (key == KeyEvent.VK_W) {
+                req_dx2 = 0;
+                req_dy2 = -1;
+            } else if (key == KeyEvent.VK_S) {
+                req_dx2 = 0;
+                req_dy2 = 1;
+            }
+        }
+    }
+
+    @Override
+    public void keyReleased(KeyEvent q) {
+        int key = q.getKeyCode();
+
+        if (key == KeyEvent.VK_A || key == KeyEvent.VK_D || key == KeyEvent.VK_W || key == KeyEvent.VK_S) {
+            req_dx2 = 0;
+            req_dy2 = 0;
+        }
+    }
+}
+
+    
 
     @Override
     public void actionPerformed(ActionEvent e) {
 
         repaint();
     }
+   
 }
