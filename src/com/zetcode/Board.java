@@ -156,9 +156,9 @@ public class Board extends JPanel implements ActionListener {
         } else {
 
             movePacman();
-            movePacman2();
-            drawPacman(g2d);
-            drawPacman2(g2d);
+            //movePacman2();
+            //drawPacman(g2d);
+            //drawPacman2(g2d);
             moveGhosts(g2d);
             checkMaze();
         }
@@ -377,7 +377,7 @@ public class Board extends JPanel implements ActionListener {
     private void movePacman2() {
 
         int pos2;
-        short ch;
+        short ch2;
 
         if (req_dx2 == -pacmand_x2 && req_dy2 == -pacmand_y2) {
             pacmand_x2 = req_dx2;
@@ -387,19 +387,19 @@ public class Board extends JPanel implements ActionListener {
         }
 
         if (pacman_x2 % BLOCK_SIZE == 0 && pacman_y2 % BLOCK_SIZE == 0) {
-            pos2 = pacman_x2 / BLOCK_SIZE + N_BLOCKS * (int) (pacman_y / BLOCK_SIZE);
-            ch = screenData[pos2];
+            pos2 = pacman_x2 / BLOCK_SIZE + N_BLOCKS * (int) (pacman_y2 / BLOCK_SIZE);
+            ch2 = screenData[pos2];
 
-            if ((ch & 16) != 0) {
-                screenData[pos2] = (short) (ch & 15);
+            if ((ch2 & 16) != 0) {
+                screenData[pos2] = (short) (ch2 & 15);
                 score++;
             }
 
             if (req_dx2 != 0 || req_dy2 != 0) {
-                if (!((req_dx2 == -1 && req_dy2 == 0 && (ch & 1) != 0)
-                        || (req_dx2 == 1 && req_dy2 == 0 && (ch & 4) != 0)
-                        || (req_dx2 == 0 && req_dy2 == -1 && (ch & 2) != 0)
-                        || (req_dx2 == 0 && req_dy2 == 1 && (ch & 8) != 0))) {
+                if (!((req_dx2 == -1 && req_dy2 == 0 && (ch2 & 1) != 0)
+                        || (req_dx2 == 1 && req_dy2 == 0 && (ch2 & 4) != 0)
+                        || (req_dx2 == 0 && req_dy2 == -1 && (ch2 & 2) != 0)
+                        || (req_dx2 == 0 && req_dy2 == 1 && (ch2 & 8) != 0))) {
                     pacmand_x = req_dx2;
                     pacmand_y = req_dy2;
                     view_dx2 = pacmand_x2;
@@ -407,16 +407,16 @@ public class Board extends JPanel implements ActionListener {
                 }
             }
             // Check for standstill
-            if ((pacmand_x2 == -1 && pacmand_y2 == 0 && (ch & 1) != 0)
-                    || (pacmand_x2 == 1 && pacmand_y2 == 0 && (ch & 4) != 0)
-                    || (pacmand_x2 == 0 && pacmand_y2 == -1 && (ch & 2) != 0)
-                    || (pacmand_x2 == 0 && pacmand_y2 == 1 && (ch & 8) != 0)) {
+            if ((pacmand_x2 == -1 && pacmand_y2 == 0 && (ch2 & 1) != 0)
+                    || (pacmand_x2 == 1 && pacmand_y2 == 0 && (ch2 & 4) != 0)
+                    || (pacmand_x2 == 0 && pacmand_y2 == -1 && (ch2 & 2) != 0)
+                    || (pacmand_x2 == 0 && pacmand_y2 == 1 && (ch2 & 8) != 0)) {
                 pacmand_x2 = 0;
                 pacmand_y2 = 0;
             }
         }
-        pacman_x2 = pacman_x2 + PACMAN_SPEED * pacmand_x;
-        pacman_y2 = pacman_y2 + PACMAN_SPEED * pacmand_y;
+        pacman_x2 = pacman_x2 + PACMAN_SPEED * pacmand_x2;
+        pacman_y2 = pacman_y2 + PACMAN_SPEED * pacmand_y2;
     }
 
     /////////draw1
@@ -876,6 +876,11 @@ public class Board extends JPanel implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+
+        repaint();
+    }
+   
+    public void actionPerformed2(ActionEvent q) {
 
         repaint();
     }
