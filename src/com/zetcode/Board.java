@@ -46,7 +46,7 @@ public class Board extends JPanel implements ActionListener {
     private int pacmanAnimPos = 0;
     
     private int N_GHOSTS = 6;
-    private int pacsLeft, score;
+    private int pacsLeft, pacsLeft2, score;
     private int[] dx, dy;
     private int[] ghost_x, ghost_y, ghost_dx, ghost_dy, ghostSpeed;
 
@@ -64,6 +64,11 @@ public class Board extends JPanel implements ActionListener {
     
     private int highScore = 0;
     private boolean youDiedScreen = false;
+    
+    private boolean multiplayer;
+    private boolean isPlayerOneAlive;
+    private boolean isPlayerTwoAlive;
+    
     
     //pacman2
     private int pacman2_x, pacman2_y, pacmand2_x, pacmand2_y;
@@ -179,18 +184,66 @@ public class Board extends JPanel implements ActionListener {
 
     private void showIntroScreen(Graphics2D g2d) {
 
-        g2d.setColor(new Color(0, 32, 48));
+        g2d.setColor(new Color(0, 0,0));
         g2d.fillRect(50, SCREEN_SIZE / 2 - 30, SCREEN_SIZE - 100, 50);
         g2d.setColor(Color.white);
-        g2d.drawRect(50, SCREEN_SIZE / 2 - 30, SCREEN_SIZE - 100, 50);
+        //g2d.drawRect(50, SCREEN_SIZE / 2 - 30, SCREEN_SIZE - 100, 50);
 
-        String s = "Press S to start.";
+        String line1 = "Press 1 for Singleplayer";
+        String line2 = "Press 2 for Multiplayer"; // Second line of text
+        
+
         Font small = new Font("Helvetica", Font.BOLD, 14);
         FontMetrics metr = this.getFontMetrics(small);
 
-        g2d.setColor(Color.white);
+        String p1 = "Player 1: Use the arrow keys";
+        String p2 = "Player 2: Use the WASD Keys"; // Second line of text
+        
+        {
+        g2d.setColor(new Color(0, 0, 200));
+        g2d.fillRect(50, SCREEN_SIZE / 2 - 90, SCREEN_SIZE - 100, 60);
+        String title = "Pacman";
+        Font mtitle = new Font("Helvetica", Font.BOLD, 40);
+        FontMetrics title2 = this.getFontMetrics(mtitle);
+        g2d.setColor(Color.yellow);
+        g2d.setFont(mtitle);
+        int x1 = (SCREEN_SIZE - title2.stringWidth(title)) / 2;
+        int y = SCREEN_SIZE / 2;
+        g2d.drawString(title, x1, y - 45); // Adjust 'y' position as needed
+        }
+        
+        {
+        g2d.setColor(Color.green);
         g2d.setFont(small);
-        g2d.drawString(s, (SCREEN_SIZE - metr.stringWidth(s)) / 2, SCREEN_SIZE / 2);
+        int x1 = (SCREEN_SIZE - metr.stringWidth(line1)) / 2;
+        int y = SCREEN_SIZE / 2;
+        g2d.drawString(line1, x1, y - 10); // Adjust 'y' position as needed
+        }
+        {
+        g2d.setColor(Color.cyan);
+        g2d.setFont(small);
+        int x2 = (SCREEN_SIZE - metr.stringWidth(line2)) / 2;
+        int y = SCREEN_SIZE / 2;
+        g2d.drawString(line2, x2, y + 10); // Adjust 'y' position as needed
+        } 
+        
+        {
+        g2d.setColor(new Color(64, 0, 0));
+        g2d.fillRect(50, SCREEN_SIZE / 2 + 20, SCREEN_SIZE - 100, 50);
+            
+        Font control = new Font("Helvetica", Font.ITALIC, 10);
+        FontMetrics control2 = this.getFontMetrics(control);
+            
+        g2d.setColor(Color.white);
+        g2d.setFont(control);
+        int x3 = (SCREEN_SIZE - control2.stringWidth(p1)) / 2;
+        int x4 = (SCREEN_SIZE - control2.stringWidth(p2)) / 2;
+        int y = SCREEN_SIZE / 2;
+   
+        g2d.drawString(p1, x3, y + 43); // Adjust 'y' position as needed
+        g2d.drawString(p2, x4, y + 53); // Adjust 'y' position as needed
+        
+        }
     }
 
     private void drawScore(Graphics2D g) {
@@ -255,6 +308,7 @@ public class Board extends JPanel implements ActionListener {
     private void death() {
 
         pacsLeft--;
+        pacsLeft2--;
 
         if (pacsLeft == 0) {
             inGame = false;
@@ -439,7 +493,6 @@ public class Board extends JPanel implements ActionListener {
     }
 
     private void drawPacman(Graphics2D g2d) {
-
         if (view_dx == -1) {
             drawPacnanLeft(g2d);
         } else if (view_dx == 1) {
@@ -448,8 +501,8 @@ public class Board extends JPanel implements ActionListener {
             drawPacmanUp(g2d);
         } else {
             drawPacmanDown(g2d);
-        }
-        
+        }    
+         
         if (view_dx2 == -1) {
             drawPacnanLeft(g2d, pacman2_x, pacman2_y);
         } else if (view_dx2 == 1) {
@@ -648,6 +701,7 @@ public class Board extends JPanel implements ActionListener {
     private void initGame() {
 
         pacsLeft = 3;
+        pacsLeft2 = 3;
         score = 0;
         initLevel();
         N_GHOSTS = 6;
@@ -704,25 +758,33 @@ private void displayYouDiedScreen(Graphics g) {
 
             ghostSpeed[i] = validSpeeds[random];
         }
-
-        pacman_x = 6 * BLOCK_SIZE;
-        pacman_y = 11 * BLOCK_SIZE;
-        pacmand_x = 0;
-        pacmand_y = 0;
-        req_dx = 0;
-        req_dy = 0;
-        view_dx = -1;
-        view_dy = 0;
+        if (multiplayer == false){
+            pacman_x = 7 * BLOCK_SIZE;
+            pacman_y = 11 * BLOCK_SIZE;
+        } else if (multiplayer == true){
+            pacman_x = 8 * BLOCK_SIZE;
+            pacman_y = 11 * BLOCK_SIZE;
+        }
+            pacmand_x = 0;
+            pacmand_y = 0;
+            req_dx = 0;
+            req_dy = 0;
+            view_dx = -1;
+            view_dy = 0;
         
-        pacman2_x = 8 * BLOCK_SIZE;
-        pacman2_y = 11 * BLOCK_SIZE;
-        pacmand2_x = 0;
-        pacmand2_y = 0;
-        req_dx2 = 0;
-        req_dy2 = 0;
-        view_dx2 = -1;
-        view_dy2 = 0;
-        
+        if (multiplayer == true){
+            pacman2_x = 6 * BLOCK_SIZE;
+            pacman2_y = 11 * BLOCK_SIZE;
+            pacmand2_x = 0;
+            pacmand2_y = 0;
+            req_dx2 = 0;
+            req_dy2 = 0;
+            view_dx2 = -1;
+            view_dy2 = 0;
+        } else if (multiplayer == false){
+            pacman2_x = -1000;
+            pacman2_y = -1000;
+        }
         dying = false;
     }
 
@@ -798,6 +860,8 @@ private void displayYouDiedScreen(Graphics g) {
     public void keyPressed(KeyEvent e) {
         int key = e.getKeyCode();
         if (inGame) {
+            
+        if (multiplayer == false){
             if (key == KeyEvent.VK_LEFT) {
                 req_dx = -1;
                 req_dy = 0;
@@ -810,25 +874,64 @@ private void displayYouDiedScreen(Graphics g) {
             } else if (key == KeyEvent.VK_DOWN) {
                 req_dx = 0;
                 req_dy = 1;
-            } else if (key == KeyEvent.VK_A) {  // Second Pacman - Move left
-                req_dx2 = -1;
-                req_dy2 = 0;
-            } else if (key == KeyEvent.VK_D) {  // Second Pacman - Move right
-                req_dx2 = 1;
-                req_dy2 = 0;
-            } else if (key == KeyEvent.VK_W) {  // Second Pacman - Move up
-                req_dx2 = 0;
-                req_dy2 = -1;
-            } else if (key == KeyEvent.VK_S) {  // Second Pacman - Move down
-                req_dx2 = 0;
-                req_dy2 = 1;
             } else if (key == KeyEvent.VK_ESCAPE && timer.isRunning()) {
                 inGame = false;
             }
+            
+        } else if (multiplayer == true){
+                System.out.println("wasd working");
+                if (key == KeyEvent.VK_LEFT) {
+                    req_dx = -1;
+                    req_dy = 0;
+                } else if (key == KeyEvent.VK_RIGHT) {
+                    req_dx = 1;
+                    req_dy = 0;
+                } else if (key == KeyEvent.VK_UP) {
+                    req_dx = 0;
+                    req_dy = -1;
+                } else if (key == KeyEvent.VK_DOWN) {
+                    req_dx = 0;
+                    req_dy = 1;
+                } else if (key == KeyEvent.VK_ESCAPE && timer.isRunning()) {
+                    inGame = false;
+                } else if (key == KeyEvent.VK_A) {  // Second Pacman - Move left
+                    req_dx2 = -1;
+                    req_dy2 = 0;
+                } else if (key == KeyEvent.VK_D) {  // Second Pacman - Move right
+                    req_dx2 = 1;
+                    req_dy2 = 0;
+                } else if (key == KeyEvent.VK_W) {  // Second Pacman - Move up
+                    req_dx2 = 0;
+                    req_dy2 = -1;
+                } else if (key == KeyEvent.VK_S) {  // Second Pacman - Move down
+                    req_dx2 = 0;
+                    req_dy2 = 1;
+                }
+        }
+        
+            
+            
+            
+        
         } else {
                 if (key == 's' || key == 'S') {
                     inGame = true;
                     initGame();
+                }
+                if (key == '1') {
+                    multiplayer = false;
+                    isPlayerOneAlive = true;
+                    inGame = true;
+                    initGame();
+                    System.out.println("Multiplayer set to false: " + multiplayer);
+                }
+                if (key == '2') {
+                    multiplayer = true;
+                    isPlayerOneAlive = true;
+                    isPlayerTwoAlive = true;
+                    inGame = true;
+                    initGame();
+                    System.out.println("Multiplayer set to true: " + multiplayer);
                 }
         
         }
