@@ -55,6 +55,10 @@ public class Board extends JPanel implements ActionListener {
     private Image pacman3up, pacman3down, pacman3left, pacman3right;
     private Image pacman4up, pacman4down, pacman4left, pacman4right;
 
+    private Image bpacman1, bpacman2up, bpacman2left, bpacman2right, bpacman2down;
+    private Image bpacman3up, bpacman3down, bpacman3left, bpacman3right;
+    private Image bpacman4up, bpacman4down, bpacman4left, bpacman4right;
+
     private int pacman_x, pacman_y, pacmand_x, pacmand_y;
     private int req_dx, req_dy, view_dx, view_dy;
     
@@ -461,16 +465,16 @@ public class Board extends JPanel implements ActionListener {
    private void drawPacmanUp(Graphics2D g2d, int x, int y) {
         switch (pacmanAnimPos) {
             case 1:
-                g2d.drawImage(pacman2up, pacman2_x + 1, pacman2_y + 1, this);
+                g2d.drawImage(bpacman2up, pacman2_x + 1, pacman2_y + 1, this);
                 break;
             case 2:
-                g2d.drawImage(pacman3up, pacman2_x + 1, pacman2_y + 1, this);
+                g2d.drawImage(bpacman3up, pacman2_x + 1, pacman2_y + 1, this);
                 break;
             case 3:
-                g2d.drawImage(pacman4up, pacman2_x + 1, pacman2_y + 1, this);
+                g2d.drawImage(bpacman4up, pacman2_x + 1, pacman2_y + 1, this);
                 break;
             default:
-                g2d.drawImage(pacman1, pacman2_x + 1, pacman2_y + 1, this);
+                g2d.drawImage(bpacman1, pacman2_x + 1, pacman2_y + 1, this);
                 break;
         }
    } 
@@ -478,16 +482,16 @@ public class Board extends JPanel implements ActionListener {
    private void drawPacmanDown(Graphics2D g2d, int x, int y) {
         switch (pacmanAnimPos) {
             case 1:
-                g2d.drawImage(pacman2down, pacman2_x + 1, pacman2_y + 1, this);
+                g2d.drawImage(bpacman2down, pacman2_x + 1, pacman2_y + 1, this);
                 break;
             case 2:
-                g2d.drawImage(pacman3down, pacman2_x + 1, pacman2_y + 1, this);
+                g2d.drawImage(bpacman3down, pacman2_x + 1, pacman2_y + 1, this);
                 break;
             case 3:
-                g2d.drawImage(pacman4down, pacman2_x + 1, pacman2_y + 1, this);
+                g2d.drawImage(bpacman4down, pacman2_x + 1, pacman2_y + 1, this);
                 break;
             default:
-                g2d.drawImage(pacman1, pacman2_x + 1, pacman2_y + 1, this);
+                g2d.drawImage(bpacman1, pacman2_x + 1, pacman2_y + 1, this);
                 break;
         }
    }
@@ -496,16 +500,16 @@ public class Board extends JPanel implements ActionListener {
        
        switch (pacmanAnimPos) {
             case 1:
-                g2d.drawImage(pacman2left, pacman2_x + 1, pacman2_y + 1, this);
+                g2d.drawImage(bpacman2left, pacman2_x + 1, pacman2_y + 1, this);
                 break;
             case 2:
-                g2d.drawImage(pacman3left, pacman2_x + 1, pacman2_y + 1, this);
+                g2d.drawImage(bpacman3left, pacman2_x + 1, pacman2_y + 1, this);
                 break;
             case 3:
-                g2d.drawImage(pacman4left, pacman2_x + 1, pacman2_y + 1, this);
+                g2d.drawImage(bpacman4left, pacman2_x + 1, pacman2_y + 1, this);
                 break;
             default:
-                g2d.drawImage(pacman1, pacman2_x + 1, pacman2_y + 1, this);
+                g2d.drawImage(bpacman1, pacman2_x + 1, pacman2_y + 1, this);
                 break;
         }
    }
@@ -514,16 +518,16 @@ public class Board extends JPanel implements ActionListener {
       
         switch (pacmanAnimPos) {
             case 1:
-                g2d.drawImage(pacman2right, pacman2_x + 1, pacman2_y + 1, this);
+                g2d.drawImage(bpacman2right, pacman2_x + 1, pacman2_y + 1, this);
                 break;
             case 2:
-                g2d.drawImage(pacman3right, pacman2_x + 1, pacman2_y + 1, this);
+                g2d.drawImage(bpacman3right, pacman2_x + 1, pacman2_y + 1, this);
                 break;
             case 3:
-                g2d.drawImage(pacman4right, pacman2_x + 1, pacman2_y + 1, this);
+                g2d.drawImage(bpacman4right, pacman2_x + 1, pacman2_y + 1, this);
                 break;
             default:
-                g2d.drawImage(pacman1, pacman2_x + 1, pacman2_y + 1, this);
+                g2d.drawImage(bpacman1, pacman2_x + 1, pacman2_y + 1, this);
                 break;
         } 
    }
@@ -738,6 +742,19 @@ private void displayYouDiedScreen(Graphics g) {
         pacman2right = new ImageIcon("src/resources/images/right1.png").getImage();
         pacman3right = new ImageIcon("src/resources/images/right2.png").getImage();
         pacman4right = new ImageIcon("src/resources/images/right3.png").getImage();
+        bpacman1 = new ImageIcon("src/resources/images/2pacman.png").getImage();
+        bpacman2up = new ImageIcon("src/resources/images/2up1.png").getImage();
+        bpacman3up = new ImageIcon("src/resources/images/2up2.png").getImage();
+        bpacman4up = new ImageIcon("src/resources/images/2up3.png").getImage();
+        bpacman2down = new ImageIcon("src/resources/images/2down1.png").getImage();
+        bpacman3down = new ImageIcon("src/resources/images/2down2.png").getImage();
+        bpacman4down = new ImageIcon("src/resources/images/2down3.png").getImage();
+        bpacman2left = new ImageIcon("src/resources/images/2left1.png").getImage();
+        bpacman3left = new ImageIcon("src/resources/images/2left2.png").getImage();
+        bpacman4left = new ImageIcon("src/resources/images/2left3.png").getImage();
+        bpacman2right = new ImageIcon("src/resources/images/2right1.png").getImage();
+        bpacman3right = new ImageIcon("src/resources/images/2right2.png").getImage();
+        bpacman4right = new ImageIcon("src/resources/images/2right3.png").getImage();
 
     }
 
