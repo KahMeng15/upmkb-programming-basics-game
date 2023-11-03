@@ -1,7 +1,7 @@
 package com.zetcode;
 
 import java.awt.EventQueue;
-import javax.swing.JFrame;
+import javax.swing.*;
 
 public class Pacman extends JFrame {
 
@@ -13,11 +13,15 @@ public class Pacman extends JFrame {
     private void initUI() {
 
         add(new Board());
-
+        
+        ImageIcon gicon = new ImageIcon("src/resources/images/gicon.png");
+        
         setTitle("Pacman");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setSize(380, 420);
+        setSize(382, 430);
         setLocationRelativeTo(null);
+        setResizable(false);
+        setIconImage(gicon.getImage());
     }
 
     public static void main(String[] args) {
