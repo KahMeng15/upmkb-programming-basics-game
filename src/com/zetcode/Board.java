@@ -10,33 +10,17 @@ import java.io.File;
 public class Board extends JPanel implements ActionListener {
 
     private Dimension d;
-    private final Font smallFont = new Font("Helvetica", Font.BOLD, 14);
     private final Font smallerFont = new Font("Helvetica", Font.PLAIN, 12);
     
     private Image ii;
     private final Color dotColor = new Color(192, 192, 0);
     private Color mazeColor;
 
-    private boolean inGame = false;
-    private boolean dying1 = false;
-    private boolean dying2 = false;
-    private boolean chooseLevel = false;
-    private boolean hasDied = false;
-    
-    private boolean music = false;
+    private boolean inGame, dying1, dying2, chooseLevel, hasDied, leaderboardDisplayed, youDiedScreen = false;
+    private final int BLOCK_SIZE = 24, N_BLOCKS = 15, SCREEN_SIZE = N_BLOCKS * BLOCK_SIZE;
+    private final int PAC_ANIM_DELAY = 2, PACMAN_ANIM_COUNT = 4, MAX_GHOSTS = 12, PACMAN_SPEED = 6;
+    private int pacAnimCount = PAC_ANIM_DELAY, pacAnimDir = 1, pacmanAnimPos = 0;
 
-    private final int BLOCK_SIZE = 24;
-    private final int N_BLOCKS = 15;
-    private final int SCREEN_SIZE = N_BLOCKS * BLOCK_SIZE;
-    private final int PAC_ANIM_DELAY = 2;
-    private final int PACMAN_ANIM_COUNT = 4;
-    private final int MAX_GHOSTS = 12;
-    private final int PACMAN_SPEED = 6;
-
-    private int pacAnimCount = PAC_ANIM_DELAY;
-    private int pacAnimDir = 1;
-    private int pacmanAnimPos = 0;
-    
     private int N_GHOSTS = 6;
     private int pacsLeft1, pacsLeft2, score1, score2;
     private int[] dx, dy;
@@ -53,24 +37,21 @@ public class Board extends JPanel implements ActionListener {
 
     private Image IntroScreen, ChooseLevelScreen, DeathScreen;
     
+    private String playeName;
+    
     private int pacman_x, pacman_y, pacmand_x, pacmand_y;
     private int req_dx, req_dy, view_dx, view_dy;
     
     private int highScore = 0;
-    private boolean youDiedScreen = false;
     
     private boolean multiplayer;
-    private boolean isPlayerOneAlive;
-    private boolean isPlayerTwoAlive;
-    
     
     
     //pacman2
     private int pacman2_x, pacman2_y, pacmand2_x, pacmand2_y;
     private int req_dx2, req_dy2, view_dx2, view_dy2;
     private int pacAnimCount2 = PAC_ANIM_DELAY;
-    private int pacAnimDir2 = 1;
-    private int pacmanAnimPos2 = 0;
+    private int pacAnimDir2 = 1, pacmanAnimPos2 = 0;;
     
     //music
     private Clip backgroundMusicClip;
@@ -183,27 +164,35 @@ public class Board extends JPanel implements ActionListener {
         }
     }
 
-    private void showDeathScreen(Graphics2D g2d) {
-        if(hasDied) {
-            g2d.drawImage(DeathScreen,-10, 0, this);
-        } else {
-            
-        }
-    }
-    
-    
-    
-    private void showIntroScreen(Graphics2D g2d) {
 
-        if (!chooseLevel && !hasDied){
-            g2d.drawImage(IntroScreen,-10, 0, this);
-            
-        } else if (chooseLevel && !hasDied) {
-            g2d.drawImage(ChooseLevelScreen,-10, 0, this);
-        } else if (hasDied) {
-            g2d.drawImage(DeathScreen,-10, 0, this);
-            LeaderboardManager.displayLeaderboard(highScore);
-        }
+    
+    
+
+        private void showIntroScreen(Graphics2D g2d) {
+            if (!chooseLevel && !hasDied) {
+                g2d.drawImage(IntroScreen, -10, 0, this);
+            } else if (chooseLevel && !hasDied) {
+                g2d.drawImage(ChooseLevelScreen, -10, 0, this);
+            } else if (hasDied && !leaderboardDisplayed) {
+                leaderboardDisplayed = true; // Set the flag to indicate that leaderboard has been displayed
+                if (score1 > score2) {
+                    playeName = getPlayerName("(Player 1) Please enter your name (max 8 characters): ");
+                    LeaderboardManager.displayLeaderboard(highScore, playeName);
+                } else {
+                    playeName = getPlayerName("(Player 2) Please enter your name (max 8 characters): ");
+                    LeaderboardManager.displayLeaderboard(highScore, playeName);
+                }
+            } else if (hasDied && leaderboardDisplayed) {
+                g2d.drawImage(DeathScreen, -10, 0, this);
+            }
+        }   
+
+        private static String getPlayerName(String prompt) {
+        String playerName;
+        do {
+            playerName = JOptionPane.showInputDialog(prompt);
+        } while (playerName != null && playerName.length() > 8); // Limit to 8 characters
+            return playerName;
     }
     
     private void drawScore(Graphics2D g) {
@@ -245,7 +234,6 @@ public class Board extends JPanel implements ActionListener {
 
         short i = 0;
         boolean finished = true;
-        int lead = 0;
 
         while (i < N_BLOCKS * N_BLOCKS && finished) {
 
@@ -284,7 +272,7 @@ public class Board extends JPanel implements ActionListener {
     }
 
     
-    private void death1 () {
+   private void death1 () {
         if (inGame) {
             if (dying1) {
                 pacsLeft1--;
@@ -300,7 +288,6 @@ public class Board extends JPanel implements ActionListener {
                 System.out.println("death true multiplayer triggered");
                 if (pacsLeft1 == 0 && pacsLeft2 == 0) {
                     inGame = false;
-                    youDiedScreen = true;
                     backgroundMusicClip.stop();
                     hasDied = true;
                     
@@ -310,7 +297,6 @@ public class Board extends JPanel implements ActionListener {
                 if (pacsLeft1 == 0) {
                     System.out.println("death false multiplayer 0 triggered");
                     inGame = false;
-                    youDiedScreen = true;
                     backgroundMusicClip.stop();
                     hasDied = true;
                     
@@ -441,9 +427,6 @@ public class Board extends JPanel implements ActionListener {
             ghost_x[i] = ghost_x[i] + (ghost_dx[i] * ghostSpeed[i]);
             ghost_y[i] = ghost_y[i] + (ghost_dy[i] * ghostSpeed[i]);
             drawGhost(g2d, ghost_x[i] + 1, ghost_y[i] + 1);
-
-            int death1 = 0;
-            int death2 = 0;
             
             if (pacman_x > (ghost_x[i] - 12) && pacman_x < (ghost_x[i] + 12)
                     && pacman_y > (ghost_y[i] - 12) && pacman_y < (ghost_y[i] + 12)
@@ -779,7 +762,7 @@ public class Board extends JPanel implements ActionListener {
         startLevel();
     }
 
-private void displayYouDiedScreen(Graphics g) {
+private void displayYouDiedScreen(Graphics g) { //delete
     Graphics2D g2d = (Graphics2D) g;
 
     g2d.setColor(new Color(0, 32, 48));
@@ -992,6 +975,9 @@ private void displayYouDiedScreen(Graphics g) {
                 inGame = false;
                 backgroundMusicClip.stop();
                 chooseLevel = false;
+//            } else if (key == KeyEvent.VK_L) {
+//                LeaderboardManager.displayLeaderboard();
+                
             }
             
         } else if (multiplayer == true){
@@ -1025,6 +1011,9 @@ private void displayYouDiedScreen(Graphics g) {
                 } else if (key == KeyEvent.VK_S&& pacsLeft2 != 0) {  // Second Pacman - Move down
                     req_dx2 = 0;
                     req_dy2 = 1;
+//                } else if (key == KeyEvent.VK_L) {
+//                LeaderboardManager.displayLeaderboard();
+                
                 }
         }
         
@@ -1045,8 +1034,6 @@ private void displayYouDiedScreen(Graphics g) {
                 }
                 
                 else if (key == '1' && chooseLevel) {
-                    isPlayerOneAlive = true;
-                    isPlayerTwoAlive = true;
                     currentSpeed = 2;
                     inGame = true;
                     chooseLevel = false;
@@ -1055,8 +1042,6 @@ private void displayYouDiedScreen(Graphics g) {
                     System.out.println("Speed: " + currentSpeed);
                 }
                 else if (key == '2' && chooseLevel) {
-                    isPlayerOneAlive = true;
-                    isPlayerTwoAlive = true;
                     currentSpeed = 3;
                     inGame = true;
                     chooseLevel = false;
@@ -1065,8 +1050,6 @@ private void displayYouDiedScreen(Graphics g) {
                     System.out.println("Speed: " + currentSpeed);
                 }
                 else if (key == '3' && chooseLevel) {
-                    isPlayerOneAlive = true;
-                    isPlayerTwoAlive = true;
                     currentSpeed = 5;
                     inGame = true;
                     chooseLevel = false;
@@ -1075,11 +1058,15 @@ private void displayYouDiedScreen(Graphics g) {
                     System.out.println("Speed: " + currentSpeed);
                 } else if (key == 'x' || key == 'X') {
                     hasDied = false;
+                    leaderboardDisplayed = false;
+                    highScore = 0;
+                } else if (key == KeyEvent.VK_L) {
+                LeaderboardManager.displayLeaderboard();
                 }
         
         }
     }
-}
+    }
 
     @Override
     public void actionPerformed(ActionEvent e) {
