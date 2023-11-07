@@ -1062,6 +1062,11 @@ private void displayYouDiedScreen(Graphics g) { //delete
                     highScore = 0;
                 } else if (key == KeyEvent.VK_L) {
                 LeaderboardManager.displayLeaderboard();
+                
+                } else if (key == KeyEvent.VK_ESCAPE && chooseLevel) {
+                    multiplayer = false;
+                    chooseLevel = false;
+                    System.out.println("Multiplayer set to true: " + multiplayer);
                 }
         
         }
